@@ -12,16 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('foodItems', JSON.stringify(foods));
     }
 
-    // Add new food item with timestamp and user info
+    // Add new food item
     function addFood() {
         const foodName = foodInput.value.trim();
         if (foodName) {
             const food = {
                 id: Date.now(),
                 name: foodName,
-                quantity: 1,
-                addedBy: 'bibhabasuiitkgp',
-                timestamp: new Date().toISOString(),
+                quantity: 1
             };
             foods.push(food);
             updateLocalStorage();
@@ -32,19 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Format date for display
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        });
-    }
-
     // Render food list
     function renderFoodList() {
         foodList.innerHTML = '';
@@ -52,10 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const foodItem = document.createElement('div');
             foodItem.className = 'food-item';
             foodItem.innerHTML = `
-                <div class="food-info">
-                    <span class="food-name">${food.name}</span>
-                    <small class="food-meta">Added by ${food.addedBy} on ${formatDate(food.timestamp)}</small>
-                </div>
+                <span class="food-name">${food.name}</span>
                 <div class="quantity-controls">
                     <button class="quantity-btn decrease-btn" onclick="decreaseQuantity(${food.id})">
                         <i class="fas fa-minus"></i>
@@ -80,11 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const summaryItem = document.createElement('div');
             summaryItem.className = 'summary-item';
             summaryItem.innerHTML = `
-                <div class="summary-info">
-                    <span>${food.name}</span>
-                    <small>Added: ${formatDate(food.timestamp)}</small>
-                </div>
-                <span class="summary-quantity">Quantity: ${food.quantity}</span>
+                <span>${food.name}</span>
+                <span>Quantity: ${food.quantity}</span>
             `;
             summary.appendChild(summaryItem);
         });
