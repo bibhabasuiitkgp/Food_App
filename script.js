@@ -4,23 +4,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const foodList = document.getElementById('foodList');
     const summary = document.getElementById('summary');
 
-    let foods = [];
+    // Initialize foods array from localStorage or empty array if nothing stored
+    let foods = JSON.parse(localStorage.getItem('foodItems')) || [];
 
-    // Add new food item
+    // Function to update localStorage
+    function updateLocalStorage() {
+        localStorage.setItem('foodItems', JSON.stringify(foods));
+    }
+
+    // Add new food item with timestamp and user info
     function addFood() {
         const foodName = foodInput.value.trim();
         if (foodName) {
             const food = {
                 id: Date.now(),
                 name: foodName,
-                quantity: 1
+                quantity: 1,
+                addedBy: 'bibhabasuiitkgp',
+                timestamp: new Date().toISOString(),
             };
             foods.push(food);
+            updateLocalStorage();
             renderFoodList();
             renderSummary();
             foodInput.value = '';
             foodInput.focus();
         }
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
     }
 
     // Render food list
@@ -30,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const foodItem = document.createElement('div');
             foodItem.className = 'food-item';
             foodItem.innerHTML = `
-                <span class="food-name">${food.name}</span>
+                <div class="food-info">
+                    <span class="food-name">${food.name}</span>
+                    <small class="food-meta">Added by ${food.addedBy} on ${formatDate(food.timestamp)}</small>
+                </div>
                 <div class="quantity-controls">
                     <button class="quantity-btn decrease-btn" onclick="decreaseQuantity(${food.id})">
                         <i class="fas fa-minus"></i>
@@ -55,8 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const summaryItem = document.createElement('div');
             summaryItem.className = 'summary-item';
             summaryItem.innerHTML = `
-                <span>${food.name}</span>
-                <span>Quantity: ${food.quantity}</span>
+                <div class="summary-info">
+                    <span>${food.name}</span>
+                    <small>Added: ${formatDate(food.timestamp)}</small>
+                </div>
+                <span class="summary-quantity">Quantity: ${food.quantity}</span>
             `;
             summary.appendChild(summaryItem);
         });
@@ -75,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const food = foods.find(f => f.id === id);
         if (food) {
             food.quantity++;
+            updateLocalStorage();
             renderFoodList();
             renderSummary();
         }
@@ -84,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const food = foods.find(f => f.id === id);
         if (food && food.quantity > 1) {
             food.quantity--;
+            updateLocalStorage();
             renderFoodList();
             renderSummary();
         }
@@ -91,7 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.deleteFood = (id) => {
         foods = foods.filter(f => f.id !== id);
+        updateLocalStorage();
         renderFoodList();
         renderSummary();
     };
+
+    // Initial render
+    renderFoodList();
+    renderSummary();
 });
